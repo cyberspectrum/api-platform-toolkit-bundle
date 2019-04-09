@@ -1,0 +1,11 @@
+services:
+  CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\SerializerOperationGroupsContextBuilder:
+    decorates: 'api_platform.serializer.context_builder'
+    arguments: [ '@CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\SerializerOperationGroupsContextBuilder.inner' ]
+    autoconfigure: false
+
+  CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\ResourceMetadataFactory:
+    decorates: 'api_platform.metadata.resource.metadata_factory'
+    decoration_priority: -5
+    arguments: [ '@CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\ResourceMetadataFactory.inner' ]
+    autoconfigure: false
