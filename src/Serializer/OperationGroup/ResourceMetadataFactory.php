@@ -48,14 +48,16 @@ class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
         if (!array_key_exists(SerializerOperationGroups::class, class_implements($resourceClass))) {
             return $resourceMetadata;
         }
+        /** @var SerializerOperationGroups $resourceClass */
         $collectionOperations = $resourceMetadata->getCollectionOperations();
         foreach ($collectionOperations as $name => &$collectionOperation) {
             switch ($name) {
+                case 'post':
+                    $this->denormalizationContext($collectionOperation, $resourceClass::getDenormalizeCreateGroups());
+                // No break here.
                 case 'get':
                     $this->normalizationContext($collectionOperation, $resourceClass::getNormalizeCollectionGroups());
                     break;
-                case 'post':
-                    $this->denormalizationContext($collectionOperation, $resourceClass::getDenormalizeCreateGroups());
             }
         }
         $resourceMetadata = $resourceMetadata->withCollectionOperations($collectionOperations);
@@ -67,11 +69,11 @@ class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
                 $itemOperation['groups'] = [];
             }
             switch ($name) {
+                case 'put':
+                    $this->denormalizationContext($itemOperation, $resourceClass::getDenormalizeUpdateGroups());
+                    // No break here.
                 case 'get':
                     $this->normalizationContext($itemOperation, $resourceClass::getNormalizeItemGroups());
-                    break;
-                case 'put':
-                    $this->normalizationContext($itemOperation, $resourceClass::getDenormalizeUpdateGroups());
             }
         }
         $resourceMetadata = $resourceMetadata->withItemOperations($itemOperations);
@@ -103,14 +105,6 @@ class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
                 $operation['normalization_context']['groups'],
                 $additionalGroups
         ));
-
-        if (!isset($operation['groups'])) {
-            $operation['groups'] = [];
-        }
-        $operation['groups'] = array_unique(array_merge(
-                $operation['groups'],
-                $additionalGroups
-        ));
     }
 
     private function denormalizationContext(array &$operation, $additionalGroups)
@@ -121,14 +115,6 @@ class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
         $operation['denormalization_context']['groups'] = array_unique(array_merge(
                 $operation['denormalization_context']['groups'],
                 $additionalGroups
-        ));
-
-        if (!isset($operation['groups'])) {
-            $operation['groups'] = [];
-        }
-        $operation['groups'] = array_unique(array_merge(
-            $operation['groups'],
-            $additionalGroups
         ));
     }
 }
