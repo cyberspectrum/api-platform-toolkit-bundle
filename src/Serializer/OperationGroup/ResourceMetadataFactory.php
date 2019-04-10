@@ -45,7 +45,9 @@ class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
     public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
-
+        if (!array_key_exists(SerializerOperationGroups::class, class_implements($resourceClass))) {
+            return $resourceMetadata;
+        }
         $collectionOperations = $resourceMetadata->getCollectionOperations();
         foreach ($collectionOperations as $name => &$collectionOperation) {
             switch ($name) {
