@@ -75,14 +75,13 @@ class SerializerOperationGroupsContextBuilder implements SerializerContextBuilde
                 $groups = $subject::getDenormalizeCreateGroups();
             }
         }
-        dump($context);
+
         if (!isset($context['groups'])) {
             $context['groups'] = [];
         }
-        $context['groups'] = array_merge($context['groups'], $groups);
+        $context['groups'] = array_unique(array_merge($context['groups'], $groups));
 
         $context['max_depth_handler'] = \App\Serializer\MaxDepthHandler::class;
-        dump($context);
 
         return $context;
     }
