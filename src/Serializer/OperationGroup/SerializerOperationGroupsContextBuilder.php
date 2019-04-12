@@ -49,18 +49,14 @@ class SerializerOperationGroupsContextBuilder implements SerializerContextBuilde
     public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null): array
     {
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
-
-        if ($normalization) {
-            $subject = $context['resource_class'];
-            if (!array_key_exists(SerializerOperationGroups::class, class_implements($context['resource_class']))) {
-                return $context;
-            }
-        } else {
-            $subject = $request->attributes->get('data');
-            if (!$subject instanceof SerializerOperationGroups) {
-                return $context;
-            }
+        if ($context['input'] || $context['output']) {
+            return $context;
         }
+        $subject = $context['resource_class'];
+        if (!array_key_exists(SerializerOperationGroups::class, class_implements($subject))) {
+            return $context;
+        }
+        /** @var SerializerOperationGroups $subject */
 
         if ($normalization) {
             if (isset($extractedAttributes['item_operation_name'])) {
@@ -80,8 +76,6 @@ class SerializerOperationGroupsContextBuilder implements SerializerContextBuilde
             $context['groups'] = [];
         }
         $context['groups'] = array_unique(array_merge($context['groups'], $groups));
-
-        $context['max_depth_handler'] = \App\Serializer\MaxDepthHandler::class;
 
         return $context;
     }
