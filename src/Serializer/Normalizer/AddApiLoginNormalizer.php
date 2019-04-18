@@ -95,7 +95,7 @@ final class AddApiLoginNormalizer implements NormalizerInterface
             'paths' => [
                 $this->parameters['login_url'] => [
                     'post' => [
-                        'tags' => ['Token'],
+                        'tags' => ['JWToken'],
                         'operationId' => 'login',
                         'consumes' => $this->allowedFormats,
                         'produces' => $this->allowedFormats,
@@ -104,6 +104,7 @@ final class AddApiLoginNormalizer implements NormalizerInterface
                             [
                                 'in' => 'body',
                                 'name' => 'user',
+                                'required' => true,
                                 'schema' => [
                                     'type' => 'object',
                                     'description' => 'Username and password of the user with optional life time for the token.',
@@ -145,13 +146,14 @@ final class AddApiLoginNormalizer implements NormalizerInterface
             'definitions' => [
                 'JWToken' => [
                     'type' => 'object',
-                    'description' => '',
+                    'description' => 'A JavaScript Web Token',
                     'properties' => [
                         'token' => [
                             'type' => 'string',
                             'readOnly' => true,
                         ]
-                    ]
+                    ],
+                    'required' => ['token'],
                 ]
             ]
         ];
