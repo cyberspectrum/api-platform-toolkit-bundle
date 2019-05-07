@@ -54,7 +54,9 @@ class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
             switch ($name) {
                 case 'post':
                     $this->denormalizationContext($collectionOperation, $resourceClass::getDenormalizeCreateGroups());
-                // No break here.
+                    // POST returns a single item - so we use item normalization here.
+                    $this->normalizationContext($collectionOperation, $resourceClass::getNormalizeItemGroups());
+                    break;
                 case 'get':
                     $this->normalizationContext($collectionOperation, $resourceClass::getNormalizeCollectionGroups());
                     break;
