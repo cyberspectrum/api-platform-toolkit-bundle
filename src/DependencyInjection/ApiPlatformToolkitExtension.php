@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 /**
  * This loads the configuration.
+ *
+ * @psalm-import-type TCyberSpectrumApiPlatformToolkitConfiguration from Configuration
  */
 class ApiPlatformToolkitExtension extends Extension
 {
@@ -32,18 +34,7 @@ class ApiPlatformToolkitExtension extends Extension
     {
         $configuration = $this->getConfiguration($configs, $container);
         assert($configuration instanceof Configuration);
-        /**
-         * @var array{
-         *   lexik_jwt: array{
-         *     enabled: bool,
-         *     add_documentation: bool,
-         *     add_aud: bool,
-         *     default_ttl: int,
-         *     login_url: string
-         *   },
-         *   enable_expression_language: bool
-         * } $config
-         */
+        /** @var TCyberSpectrumApiPlatformToolkitConfiguration $config */
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -57,7 +48,7 @@ class ApiPlatformToolkitExtension extends Extension
                 $container->removeDefinition(AddAudToJwtListener::class);
             }
             $container->setParameter('csap_toolkit.lexik_jwt_default_ttl', $config['lexik_jwt']['default_ttl']);
-            $container->setParameter('csap_toolkit.lexik_jwt_login_url', $config['lexik_jwt']['login_url']);
+            $container->setParameter('csap_toolkit.lexik_jwt_login_url', $config['lexik_jwt']['json_login_url']);
         }
 
         $loader->load('services.php');

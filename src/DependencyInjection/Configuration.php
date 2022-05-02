@@ -21,6 +21,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * Adds the Contao configuration structure.
+ *
+ * @psalm-type TCyberSpectrumApiPlatformToolkitConfiguration=array{
+ *   lexik_jwt: array{
+ *     enabled: bool,
+ *     add_documentation: bool,
+ *     add_aud: bool,
+ *     default_ttl: int,
+ *     json_login_url: string
+ *   },
+ *   enable_expression_language: bool,
+ * }
  */
 class Configuration implements ConfigurationInterface
 {
@@ -49,7 +60,7 @@ class Configuration implements ConfigurationInterface
                         ->integerNode('default_ttl')
                             ->defaultValue(3600)
                         ->end()
-                        ->scalarNode('login_url')
+                        ->scalarNode('json_login_url')
                             ->defaultValue('/api/login_check')
                         ->end()
                         ->booleanNode('add_aud')
