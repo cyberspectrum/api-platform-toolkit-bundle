@@ -1,3 +1,4 @@
+/.phpcq/*
 /vendor/
-.phpunit
+.phpunit.result.cache
 /phpunit.xml
