@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\Tests;
 
@@ -21,22 +21,34 @@ use CyberSpectrum\ApiPlatformToolkit\DependencyInjection\Compiler\AddExpressionL
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/** @covers \CyberSpectrum\ApiPlatformToolkit\ApiPlatformToolkitBundle */
 class ApiPlatformToolkitBundleTest extends TestCase
 {
-    /**
-     * Test.
-     *
-     * @return void
-     */
-    public function testRegistersCompilerPass()
+    public function testCanBeInstantiated(): void
     {
+        $container = new ContainerBuilder();
+
         $bundle = new ApiPlatformToolkitBundle();
-
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-        $container->expects($this->once())->method('addCompilerPass')->willReturnCallback(function ($pass) {
-            $this->assertInstanceOf(AddExpressionLanguageProvidersPass::class, $pass);
-        });
-
         $bundle->build($container);
+
+        if ($this->isCompilerPassRegistered($container)) {
+            $this->addToAssertionCount(1);
+            return;
+        }
+
+        self::fail(AddExpressionLanguageProvidersPass::class . ' has not been registered as compiler pass');
+    }
+
+    private function isCompilerPassRegistered(ContainerBuilder $container): bool
+    {
+        $passes = $container->getCompilerPassConfig()->getPasses();
+        foreach ($passes as $pass) {
+            if ($pass instanceof AddExpressionLanguageProvidersPass) {
+                $this->addToAssertionCount(1);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

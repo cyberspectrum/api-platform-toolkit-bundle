@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\DependencyInjection\Compiler;
 
@@ -20,20 +20,17 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+use function array_keys;
+
 /**
  * Registers the expression language providers to the api-platform expression language.
  */
 class AddExpressionLanguageProvidersPass implements CompilerPassInterface
 {
-    /**
-     * Service tag to collect expression language providers.
-     */
-    const SERVICE_TAG = 'csap_toolkit.security.expression_language_provider';
+    /** Service tag to collect expression language providers. */
+    public const SERVICE_TAG = 'csap_toolkit.security.expression_language_provider';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->getParameter('csap_toolkit.enable_expression_language')) {
             return;
@@ -42,7 +39,7 @@ class AddExpressionLanguageProvidersPass implements CompilerPassInterface
         if ($container->has('api_platform.security.expression_language')) {
             $definition = $container->findDefinition('api_platform.security.expression_language');
             foreach (array_keys($container->findTaggedServiceIds(self::SERVICE_TAG, true)) as $id) {
-                // Ensure we do not have the call present already (if api-platform should decide to implement the tag.
+                // Ensure we do not have the call present already (if api-platform should decide to implement the tag).
                 $definition->addMethodCall('registerProvider', [new Reference($id)]);
             }
         }

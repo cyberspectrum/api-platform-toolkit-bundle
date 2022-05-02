@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\DependencyInjection;
 
@@ -27,9 +27,10 @@ class Configuration implements ConfigurationInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @return TreeBuilder
+     * @psalm-suppress MixedMethodCall
+     * @psalm-suppress PossiblyUndefinedMethod
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('api_platform_toolkit');
         $rootNode    = $treeBuilder->getRootNode();

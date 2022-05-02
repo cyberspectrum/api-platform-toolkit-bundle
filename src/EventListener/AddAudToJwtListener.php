@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\EventListener;
 
@@ -24,34 +24,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class AddAudToJwtListener
 {
-    /**
-     * The request stack.
-     *
-     * @var RequestStack
-     */
-    private $requestStack;
+    /** The request stack. */
+    private RequestStack $requestStack;
 
-    /**
-     * Create a new instance.
-     *
-     * @param RequestStack $requestStack The request stack.
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * Override or unset the ttl parameter.
-     *
-     * @param JWTCreatedEvent $event The event to process.
-     *
-     * @return void
-     */
-    public function onJWTCreated(JWTCreatedEvent $event): void
+    /** Add the 'aud' parameter. */
+    public function __invoke(JWTCreatedEvent $event): void
     {
         $payload = $event->getData();
         $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
 
         $payload['aud'] = $request->getSchemeAndHttpHost();
 

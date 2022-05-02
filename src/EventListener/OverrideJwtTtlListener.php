@@ -12,38 +12,29 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\EventListener;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use function array_key_exists;
+use function is_array;
+use function json_decode;
+use function time;
+
 /**
  * This allows to override the TTL in a JWT within the request.
  */
 class OverrideJwtTtlListener
 {
-    /**
-     * The request stack.
-     *
-     * @var RequestStack
-     */
-    private $requestStack;
+    /** The request stack. */
+    private RequestStack $requestStack;
 
-    /**
-     * The default ttl to use.
-     *
-     * @var int
-     */
-    private $defaultTtl;
+    /** The default ttl to use. */
+    private int $defaultTtl;
 
-    /**
-     * Create a new instance.
-     *
-     * @param RequestStack $requestStack The request stack.
-     * @param int          $defaultTtl   The default TTL to use.
-     */
     public function __construct(RequestStack $requestStack, int $defaultTtl)
     {
         $this->requestStack = $requestStack;
@@ -54,15 +45,18 @@ class OverrideJwtTtlListener
      * Override or unset the ttl parameter.
      *
      * @param JWTCreatedEvent $event The event to process.
-     *
-     * @return void
      */
-    public function onJWTCreated(JWTCreatedEvent $event): void
+    public function __invoke(JWTCreatedEvent $event): void
     {
-        $payload = $event->getData();
         $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+        $payload = $event->getData();
         $ttl     = $this->defaultTtl;
-        if (($data = json_decode($request->getContent(), true)) && array_key_exists('ttl', $data)) {
+        /** @var mixed $data */
+        $data    = json_decode((string) $request->getContent(), true);
+        if (is_array($data) && array_key_exists('ttl', $data)) {
             $ttl = (int) $data['ttl'];
         }
         switch ($ttl) {

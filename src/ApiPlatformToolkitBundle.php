@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit;
 
@@ -25,12 +25,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class ApiPlatformToolkitBundle extends Bundle
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
-        parent::build($container);
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
     }
 }

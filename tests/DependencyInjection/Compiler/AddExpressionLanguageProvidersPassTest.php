@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\Tests\DependencyInjection\Compiler;
 
@@ -28,14 +28,12 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class AddExpressionLanguageProvidersPassTest extends TestCase
 {
-    /**
-     * Test.
-     *
-     * @return void
-     */
-    public function testIgnoresServicesWhenExpressionLanguageNotActivated()
+    public function testIgnoresServicesWhenExpressionLanguageNotActivated(): void
     {
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container = $this
+            ->getMockBuilder(ContainerBuilder::class)
+            ->onlyMethods(['getParameter', 'has', 'findDefinition'])
+            ->getMock();
         $container
             ->expects($this->once())
             ->method('getParameter')
@@ -62,7 +60,10 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
      */
     public function testIgnoresServicesWhenExpressionLanguageHandlingIsDisabled()
     {
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container = $this
+            ->getMockBuilder(ContainerBuilder::class)
+            ->onlyMethods(['getParameter', 'has', 'findDefinition'])
+            ->getMock();
         $container
             ->expects($this->once())
             ->method('getParameter')
@@ -81,17 +82,15 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * Test.
-     *
-     * @return void
-     */
-    public function testAddsServices()
+    public function testAddsServices(): void
     {
         $service1 = new Definition();
         $service2 = new Definition();
 
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container = $this
+            ->getMockBuilder(ContainerBuilder::class)
+            ->onlyMethods(['getParameter', 'has', 'findDefinition', 'findTaggedServiceIds'])
+            ->getMock();
         $container
             ->expects($this->once())
             ->method('getParameter')

@@ -4,15 +4,23 @@
   "license": "MIT",
   "type": "symfony-bundle",
   "require": {
-    "php": "^8.0",
+    "php": "^7.4 || ^8.0",
+    "ext-json": "*",
     "api-platform/core": "^2.4",
+    "symfony/config": "^5.4 || ^6.0",
     "symfony/dependency-injection": "^5.4 || ^6.0",
+    "symfony/http-foundation": "^5.4 || ^6.0",
     "symfony/http-kernel": "^5.4 || ^6.0"
   },
   "require-dev": {
     "lexik/jwt-authentication-bundle": "^2.6",
     "phpcq/runner-bootstrap": "^1.0@dev",
+    "symfony/serializer": "^5.4 || ^6.0",
     "symfony/test-pack": "^1.0"
+  },
+  "conflict": {
+    "lexik/jwt-authentication-bundle": "<2.6,>=3.0",
+    "symfony/serializer": "<5.4,>=7.0"
   },
   "autoload": {
     "psr-4": {

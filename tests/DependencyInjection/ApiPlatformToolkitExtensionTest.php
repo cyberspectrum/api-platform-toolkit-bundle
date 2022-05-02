@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\Tests\DependencyInjection;
 
@@ -30,11 +30,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ApiPlatformToolkitExtensionTest extends TestCase
 {
-    /**
-     * Test that the service.yml is loaded.
-     *
-     * @return void
-     */
+    /** Test that the service.yml is loaded with default values. */
     public function testLoadWithDefaults(): void
     {
         $container = new ContainerBuilder();
@@ -42,19 +38,15 @@ class ApiPlatformToolkitExtensionTest extends TestCase
 
         $extension->load([], $container);
 
-        $this->assertTrue($container->getParameter('csap_toolkit.enable_expression_language'));
-        $this->assertSame(3600, $container->getParameter('csap_toolkit.lexik_jwt_default_ttl'));
-        $this->assertSame('/api/login_check', $container->getParameter('csap_toolkit.lexik_jwt_login_url'));
-        $this->assertTrue($container->has(OverrideJwtTtlListener::class));
-        $this->assertTrue($container->has(AddAudToJwtListener::class));
-        $this->assertTrue($container->has(AddApiLoginNormalizer::class));
+        self::assertTrue($container->getParameter('csap_toolkit.enable_expression_language'));
+        self::assertSame(3600, $container->getParameter('csap_toolkit.lexik_jwt_default_ttl'));
+        self::assertSame('/api/login_check', $container->getParameter('csap_toolkit.lexik_jwt_login_url'));
+        self::assertTrue($container->has(OverrideJwtTtlListener::class));
+        self::assertTrue($container->has(AddAudToJwtListener::class));
+        self::assertTrue($container->has(AddApiLoginNormalizer::class));
     }
 
-    /**
-     * Test that the documentation service may be disabled.
-     *
-     * @return void
-     */
+    /** Test that the documentation service may be disabled. */
     public function testDisableJwtDocumentation(): void
     {
         $container = new ContainerBuilder();
@@ -68,14 +60,25 @@ class ApiPlatformToolkitExtensionTest extends TestCase
             ]
         ], $container);
 
-        $this->assertFalse($container->has(AddApiLoginNormalizer::class));
+        self::assertFalse($container->has(AddApiLoginNormalizer::class));
     }
 
-    /**
-     * Test that the documentation service may be disabled.
-     *
-     * @return void
-     */
+    /** Test that the documentation service may be disabled. */
+    public function testDisableJwt(): void
+    {
+        $container = new ContainerBuilder();
+        $extension = new ApiPlatformToolkitExtension();
+
+        $extension->load([
+            'api_platform_toolkit' => [
+                'lexik_jwt' => false
+            ]
+        ], $container);
+
+        self::assertFalse($container->has(AddApiLoginNormalizer::class));
+    }
+
+    /** Test that the documentation service may be disabled. */
     public function testDisableAddAudToJwt(): void
     {
         $container = new ContainerBuilder();
@@ -89,21 +92,21 @@ class ApiPlatformToolkitExtensionTest extends TestCase
             ]
         ], $container);
 
-        $this->assertFalse($container->has(AddAudToJwtListener::class));
+        self::assertFalse($container->has(AddAudToJwtListener::class));
     }
 
-    /**
-     * Test that the service.yml is loaded.
-     *
-     * @return void
-     */
-    public function testLoadsServiceYml(): void
+    /** Test that the service.yml is loaded. */
+    public function testDisableExpressionLanguage(): void
     {
         $container = new ContainerBuilder();
         $extension = new ApiPlatformToolkitExtension();
 
-        $extension->load([], $container);
+        $extension->load([
+            'api_platform_toolkit' => [
+                'enable_expression_language' => false,
+            ]
+        ], $container);
 
-        $this->assertTrue($container->has(OverrideJwtTtlListener::class));
+        self::assertTrue($container->has(OverrideJwtTtlListener::class));
     }
 }

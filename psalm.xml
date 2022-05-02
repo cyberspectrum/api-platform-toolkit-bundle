@@ -16,4 +16,12 @@
 -->
         </ignoreFiles>
     </projectFiles>
+    <issueHandlers>
+        <UndefinedDocblockClass>
+            <errorLevel type="suppress">
+                <!-- can be removed when we are PHP 8.1 only -->
+                <referencedClass name="UnitEnum" />
+            </errorLevel>
+        </UndefinedDocblockClass>
+    </issueHandlers>
 </psalm>

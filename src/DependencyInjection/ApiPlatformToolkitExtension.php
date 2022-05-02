@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\DependencyInjection;
 
@@ -21,26 +21,35 @@ use CyberSpectrum\ApiPlatformToolkit\Serializer\Normalizer\AddApiLoginNormalizer
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 /**
  * This loads the configuration.
  */
 class ApiPlatformToolkitExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $configuration = $this->getConfiguration($configs, $container);
+        assert($configuration instanceof Configuration);
+        /**
+         * @var array{
+         *   lexik_jwt: array{
+         *     enabled: bool,
+         *     add_documentation: bool,
+         *     add_aud: bool,
+         *     default_ttl: int,
+         *     login_url: string
+         *   },
+         *   enable_expression_language: bool
+         * } $config
+         */
+        $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('csap_toolkit.enable_expression_language', $config['enable_expression_language']);
-
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         if ($config['lexik_jwt']['enabled']) {
-            $loader->load('lexik_jwt.yml');
+            $loader->load('lexik_jwt.php');
             if (!$config['lexik_jwt']['add_documentation']) {
                 $container->removeDefinition(AddApiLoginNormalizer::class);
             }
@@ -51,6 +60,11 @@ class ApiPlatformToolkitExtension extends Extension
             $container->setParameter('csap_toolkit.lexik_jwt_login_url', $config['lexik_jwt']['login_url']);
         }
 
-        $loader->load('services.yml');
+        $loader->load('services.php');
+
+        $container->setParameter(
+            'csap_toolkit.enable_expression_language',
+            $config['enable_expression_language']
+        );
     }
 }

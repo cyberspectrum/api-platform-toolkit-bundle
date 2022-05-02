@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup;
 
@@ -24,14 +24,10 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @see https://www.thinkbean.com/drupal-development-blog/restrict-properties-api-platform-serialization-groups
  */
-class SerializerOperationGroupsContextBuilder implements SerializerContextBuilderInterface
+final class SerializerOperationGroupsContextBuilder implements SerializerContextBuilderInterface
 {
-    /**
-     * The decorated service.
-     *
-     * @var SerializerContextBuilderInterface
-     */
-    private $decorated;
+    /** The decorated service. */
+    private SerializerContextBuilderInterface $decorated;
 
     /**
      * Create a new instance.
@@ -49,7 +45,7 @@ class SerializerOperationGroupsContextBuilder implements SerializerContextBuilde
     public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null): array
     {
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
-        if ($context['input'] || $context['output']) {
+        if (!$this->validateContext($context)) {
             return $context;
         }
         $subject = $context['resource_class'];
@@ -78,5 +74,19 @@ class SerializerOperationGroupsContextBuilder implements SerializerContextBuilde
         $context['groups'] = array_unique(array_merge($context['groups'], $groups));
 
         return $context;
+    }
+
+    /** @psalm-assert-if-true array{resource_class: string, groups?: list<string>} $context */
+    private function validateContext(array $context): bool
+    {
+        if (!empty($context['input']) || !empty($context['output'])) {
+            return false;
+        }
+
+        if (empty($context['resource_class'])) {
+            return false;
+        }
+
+        return true;
     }
 }

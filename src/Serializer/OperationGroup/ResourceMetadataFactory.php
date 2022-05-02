@@ -12,7 +12,7 @@
  * @filesource
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup;
 
@@ -20,14 +20,17 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
- * This class fixups the resources.
+ * This class fixes the resources.
+ *
+ * @psalm-type TResourceOperation = array{
+ *     normalization_context?: array{groups?: list<string>},
+ *     denormalization_context?: array{groups?: list<string>}
+ *  }
+ * @psalm-type TResourceOperationContextName='normalization_context'|'denormalization_context'
  */
-class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
+final class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
-    /**
-     * @var ResourceMetadataFactoryInterface
-     */
-    private $decorated;
+    private ResourceMetadataFactoryInterface $decorated;
 
     /**
      * Create a new instance.
@@ -48,75 +51,120 @@ class ResourceMetadataFactory implements ResourceMetadataFactoryInterface
         if (!array_key_exists(SerializerOperationGroups::class, class_implements($resourceClass))) {
             return $resourceMetadata;
         }
-        /** @var SerializerOperationGroups $resourceClass */
+
+        $resourceMetadata = $this->updateCollectionOperations($resourceMetadata, $resourceClass);
+        $resourceMetadata = $this->updateItemOperations($resourceMetadata, $resourceClass);
+
+        return $this->cleanAttributes($resourceMetadata);
+    }
+
+    private function updateCollectionOperations(
+        ResourceMetadata $resourceMetadata,
+        string $resourceClass
+    ): ResourceMetadata {
+        /** @var array<string, TResourceOperation>|null $collectionOperations */
         $collectionOperations = $resourceMetadata->getCollectionOperations();
+        if (null == $collectionOperations) {
+            return $resourceMetadata;
+        }
+
+        /** @var SerializerOperationGroups $resourceClass - pretty hacky but how else to denote static invocation? */
         foreach ($collectionOperations as $name => &$collectionOperation) {
             switch ($name) {
                 case 'post':
-                    $this->denormalizationContext($collectionOperation, $resourceClass::getDenormalizeCreateGroups());
+                    $this->updateContext(
+                        $collectionOperation,
+                        'denormalization_context',
+                        $resourceClass::getDenormalizeCreateGroups()
+                    );
                     // POST returns a single item - so we use item normalization here.
-                    $this->normalizationContext($collectionOperation, $resourceClass::getNormalizeItemGroups());
+                    $this->updateContext(
+                        $collectionOperation,
+                        'normalization_context',
+                        $resourceClass::getNormalizeItemGroups()
+                    );
                     break;
                 case 'get':
-                    $this->normalizationContext($collectionOperation, $resourceClass::getNormalizeCollectionGroups());
+                    $this->updateContext(
+                        $collectionOperation,
+                        'normalization_context',
+                        $resourceClass::getNormalizeCollectionGroups()
+                    );
                     break;
             }
         }
-        $resourceMetadata = $resourceMetadata->withCollectionOperations($collectionOperations);
-        unset($collectionOperations, $collectionOperation);
+        return $resourceMetadata->withCollectionOperations($collectionOperations);
+    }
 
+    private function updateItemOperations(ResourceMetadata $resourceMetadata, string $resourceClass): ResourceMetadata
+    {
+        /** @var array<string, TResourceOperation>|null $itemOperations */
         $itemOperations = $resourceMetadata->getItemOperations();
+        if (null == $itemOperations) {
+            return $resourceMetadata;
+        }
+
+        /** @var SerializerOperationGroups $resourceClass - pretty hacky but how else to denote static invocation? */
         foreach ($itemOperations as $name => &$itemOperation) {
             if (!isset($itemOperation['groups'])) {
                 $itemOperation['groups'] = [];
             }
             switch ($name) {
                 case 'put':
-                    $this->denormalizationContext($itemOperation, $resourceClass::getDenormalizeUpdateGroups());
-                    // No break here.
+                    $this->updateContext(
+                        $itemOperation,
+                        'denormalization_context',
+                        $resourceClass::getDenormalizeUpdateGroups()
+                    );
+                // No break here.
                 case 'get':
-                    $this->normalizationContext($itemOperation, $resourceClass::getNormalizeItemGroups());
+                    $this->updateContext(
+                        $itemOperation,
+                        'normalization_context',
+                        $resourceClass::getNormalizeItemGroups()
+                    );
             }
         }
-        $resourceMetadata = $resourceMetadata->withItemOperations($itemOperations);
-        unset($itemOperations, $itemOperation);
+        return $resourceMetadata->withItemOperations($itemOperations);
+    }
 
+    /**
+     * @param TResourceOperation $operation
+     * @param TResourceOperationContextName $contextName
+     * @param list<string> $additionalGroups
+     *
+     * @psalm-suppress ReferenceConstraintViolation - revisit when @param-out works correctly.
+     */
+    private function updateContext(array &$operation, string $contextName, array $additionalGroups): void
+    {
+        $operation[$contextName]['groups'] = array_unique(array_merge(
+            $operation[$contextName]['groups'] ?? [],
+            $additionalGroups
+        ));
+    }
+
+    private function cleanAttributes(ResourceMetadata $resourceMetadata): ResourceMetadata
+    {
+        /** @var array{
+         *     normalization_context?: array{groups: list<string>},
+         *     denormalization_context?: array{groups: list<string>}
+         *  } $attributes */
         $attributes = $resourceMetadata->getAttributes();
 
         // Remove the "empty" group.
-        if (isset($attributes['normalization_context']['groups']) && $attributes['normalization_context']['groups'] === ['empty']) {
-            $attributes['normalization_context']['groups'] = [];
+        if (
+            isset($attributes['normalization_context']['groups'])
+            && $attributes['normalization_context']['groups'] === ['empty']
+        ) {
             unset($attributes['normalization_context']['groups']);
         }
-        if (isset($attributes['denormalization_context']['groups']) && $attributes['denormalization_context']['groups'] === ['empty']) {
-            $attributes['denormalization_context']['groups'] = [];
+        if (
+            isset($attributes['denormalization_context']['groups'])
+            && $attributes['denormalization_context']['groups'] === ['empty']
+        ) {
             unset($attributes['denormalization_context']['groups']);
         }
 
-        $resourceMetadata = $resourceMetadata->withAttributes($attributes);
-
-        return $resourceMetadata;
-    }
-
-    private function normalizationContext(array &$operation, $additionalGroups)
-    {
-        if (!isset($operation['normalization_context']['groups'])) {
-            $operation['normalization_context']['groups'] = [];
-        }
-        $operation['normalization_context']['groups'] = array_unique(array_merge(
-                $operation['normalization_context']['groups'],
-                $additionalGroups
-        ));
-    }
-
-    private function denormalizationContext(array &$operation, $additionalGroups)
-    {
-        if (!isset($operation['denormalization_context']['groups'])) {
-            $operation['denormalization_context']['groups'] = [];
-        }
-        $operation['denormalization_context']['groups'] = array_unique(array_merge(
-                $operation['denormalization_context']['groups'],
-                $additionalGroups
-        ));
+        return $resourceMetadata->withAttributes($attributes);
     }
 }

@@ -4,7 +4,9 @@
     "static", "self", "parent",
     "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object",
     "Imagick",
-    "LIBXSLT_DOTTED_VERSION"
+    "LIBXSLT_DOTTED_VERSION",
+    "Lexik\\Bundle\\JWTAuthenticationBundle\\Event\\JWTCreatedEvent",
+    "Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface"
   ],
   "php-core-extensions" : [
     "Core",
