@@ -19,6 +19,7 @@ namespace CyberSpectrum\ApiPlatformToolkit\Tests\DependencyInjection;
 use CyberSpectrum\ApiPlatformToolkit\DependencyInjection\ApiPlatformToolkitExtension;
 use CyberSpectrum\ApiPlatformToolkit\EventListener\AddAudToJwtListener;
 use CyberSpectrum\ApiPlatformToolkit\EventListener\OverrideJwtTtlListener;
+use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryRemoveHtmlFormat;
 use CyberSpectrum\ApiPlatformToolkit\Serializer\Normalizer\AddApiLoginNormalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -93,6 +94,22 @@ class ApiPlatformToolkitExtensionTest extends TestCase
         ], $container);
 
         self::assertFalse($container->has(AddAudToJwtListener::class));
+    }
+
+    public function testDisableRemoveHtmlFormat(): void
+    {
+        $container = new ContainerBuilder();
+        $extension = new ApiPlatformToolkitExtension();
+
+        $extension->load([
+            'api_platform_toolkit' => [
+                'openapi_docs' => [
+                    'remove_html_format' => false,
+                ],
+            ],
+        ], $container);
+
+        self::assertFalse($container->has(OpenApiFactoryRemoveHtmlFormat::class));
     }
 
     /** Test that the service.yml is loaded. */

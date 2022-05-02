@@ -28,9 +28,13 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  *     add_documentation: bool,
  *     add_aud: bool,
  *     default_ttl: int,
- *     json_login_url: string
+ *     json_login_url: string,
  *   },
  *   enable_expression_language: bool,
+ *   openapi_docs: array{
+ *     enabled: bool,
+ *     remove_html_format: bool,
+ *   },
  * }
  */
 class Configuration implements ConfigurationInterface
@@ -51,7 +55,16 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_expression_language')
                     ->defaultValue(true)
                 ->end()
-               ->arrayNode('lexik_jwt')
+                ->arrayNode('openapi_docs')
+                    ->canBeDisabled()
+                    ->children()
+                        ->booleanNode('remove_html_format')
+                            ->info('If set, this removes the text/html from the allowed formats in swagger UI.')
+                            ->defaultValue(true)
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('lexik_jwt')
                     ->canBeDisabled()
                     ->children()
                         ->booleanNode('add_documentation')

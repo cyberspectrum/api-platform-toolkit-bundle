@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace CyberSpectrum\ApiPlatformToolkit\DependencyInjection;
 
 use CyberSpectrum\ApiPlatformToolkit\EventListener\AddAudToJwtListener;
+use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryRemoveHtmlFormat;
 use CyberSpectrum\ApiPlatformToolkit\Serializer\Normalizer\AddApiLoginNormalizer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -53,6 +54,11 @@ class ApiPlatformToolkitExtension extends Extension
 
         $loader->load('services.php');
 
+        if ($config['openapi_docs']['enabled']) {
+            if (!$config['openapi_docs']['remove_html_format']) {
+                $container->removeDefinition(OpenApiFactoryRemoveHtmlFormat::class);
+            }
+        }
         $container->setParameter(
             'csap_toolkit.enable_expression_language',
             $config['enable_expression_language']

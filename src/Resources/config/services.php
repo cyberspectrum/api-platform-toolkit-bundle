@@ -14,6 +14,7 @@
 
 declare(strict_types=1);
 
+use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryRemoveHtmlFormat;
 use CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\ResourceMetadataFactory;
 use CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\SerializerOperationGroupsContextBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -32,4 +33,8 @@ return function (ContainerConfigurator $configurator): void {
         ->decorate('api_platform.metadata.resource.metadata_factory')
         ->arg('$decorated', service('.inner'))
         ->autoconfigure(false);
+
+    $services->set(OpenApiFactoryRemoveHtmlFormat::class)
+        ->decorate('api_platform.openapi.factory')
+        ->arg('$decorated', service('.inner'));
 };
