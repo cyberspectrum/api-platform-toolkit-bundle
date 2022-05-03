@@ -1,0 +1,35 @@
+stages:
+  - build
+  - deploy
+
+build:php-7.4:
+  image: discordier/php-runner:7.4-alpine
+  stage: build
+  before_script:
+    - export SSH_PRIVATE_KEY=
+    - env
+    - composer self-update -vvv && composer --version
+    - composer install --prefer-dist --no-interaction --no-progress --no-scripts
+    - vendor/bin/phpcq self-update
+    - vendor/bin/phpcq install -vvv
+  script:
+    - vendor/bin/phpcq run -o default -r code-climate
+  cache:
+    paths:
+      - vendor/
+
+build:php-8.0:
+  image: discordier/php-runner:8.0-alpine
+  stage: build
+  before_script:
+    - export SSH_PRIVATE_KEY=
+    - env
+    - composer self-update -vvv && composer --version
+    - composer install --prefer-dist --no-interaction --no-progress --no-scripts
+    - vendor/bin/phpcq self-update
+    - vendor/bin/phpcq install -vvv
+  script:
+    - vendor/bin/phpcq run -o default -r code-climate
+  cache:
+    paths:
+      - vendor/
