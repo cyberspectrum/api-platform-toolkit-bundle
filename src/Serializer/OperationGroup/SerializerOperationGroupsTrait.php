@@ -16,18 +16,22 @@ declare(strict_types=1);
 
 namespace CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup;
 
+use Symfony\Component\Serializer\Annotation as Serializer;
+
 /**
  * This trait defines automatically all read and write constants if any are defined.
  *
  * @see \CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\SerializerOperationGroups
+ *
+ * @psalm-require-implements \CyberSpectrum\ApiPlatformToolkit\Serializer\OperationGroup\SerializerOperationGroups
  */
 trait SerializerOperationGroupsTrait
 {
     /**
-     * This returns the normalization groups to use when a collection operation is issued.
-     *
-     * @return array
+     * @return list<string>
+     * @Serializer\Ignore
      */
+    #[Serializer\Ignore]
     public static function getNormalizeCollectionGroups(): array
     {
         $groups = [];
@@ -39,10 +43,10 @@ trait SerializerOperationGroupsTrait
     }
 
     /**
-     * This returns normalization groups to use when an item operation is issued.
-     *
-     * @return array
+     * @return list<string>
+     * @Serializer\Ignore
      */
+    #[Serializer\Ignore]
     public static function getNormalizeItemGroups(): array
     {
         $groups = [];
@@ -54,10 +58,10 @@ trait SerializerOperationGroupsTrait
     }
 
     /**
-     * This returns normalization groups to use when an item create operation is issued.
-     *
-     * @return array
+     * @return list<string>
+     * @Serializer\Ignore
      */
+    #[Serializer\Ignore]
     public static function getDenormalizeCreateGroups(): array
     {
         $groups = [];
@@ -69,10 +73,10 @@ trait SerializerOperationGroupsTrait
     }
 
     /**
-     * This returns normalization groups to use when an item update operation is issued.
-     *
-     * @return array
+     * @return list<string>
+     * @Serializer\Ignore
      */
+    #[Serializer\Ignore]
     public static function getDenormalizeUpdateGroups(): array
     {
         $groups = [];
