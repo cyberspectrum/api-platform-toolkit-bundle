@@ -29,6 +29,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  *     add_aud: bool,
  *     default_ttl: int,
  *     json_login_url: string,
+ *     json_login_refresh_url: ?string,
  *   },
  *   enable_expression_language: bool,
  *   openapi_docs: array{
@@ -75,6 +76,9 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('json_login_url')
                             ->defaultValue('/api/login_check')
+                        ->end()
+                        ->scalarNode('json_login_refresh_url')
+                            ->defaultNull()
                         ->end()
                         ->booleanNode('add_aud')
                             ->defaultValue(true)

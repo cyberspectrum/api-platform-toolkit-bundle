@@ -19,8 +19,8 @@ namespace CyberSpectrum\ApiPlatformToolkit\Tests\DependencyInjection;
 use CyberSpectrum\ApiPlatformToolkit\DependencyInjection\ApiPlatformToolkitExtension;
 use CyberSpectrum\ApiPlatformToolkit\EventListener\AddAudToJwtListener;
 use CyberSpectrum\ApiPlatformToolkit\EventListener\OverrideJwtTtlListener;
+use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryAddLoginEndpoint;
 use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryRemoveHtmlFormat;
-use CyberSpectrum\ApiPlatformToolkit\Serializer\Normalizer\AddApiLoginNormalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -42,9 +42,10 @@ class ApiPlatformToolkitExtensionTest extends TestCase
         self::assertTrue($container->getParameter('csap_toolkit.enable_expression_language'));
         self::assertSame(3600, $container->getParameter('csap_toolkit.lexik_jwt_default_ttl'));
         self::assertSame('/api/login_check', $container->getParameter('csap_toolkit.lexik_jwt_login_url'));
+        self::assertNull($container->getParameter('csap_toolkit.lexik_jwt_login_refresh_url'));
         self::assertTrue($container->has(OverrideJwtTtlListener::class));
         self::assertTrue($container->has(AddAudToJwtListener::class));
-        self::assertTrue($container->has(AddApiLoginNormalizer::class));
+        self::assertTrue($container->has(OpenApiFactoryAddLoginEndpoint::class));
     }
 
     /** Test that the documentation service may be disabled. */
@@ -61,7 +62,7 @@ class ApiPlatformToolkitExtensionTest extends TestCase
             ]
         ], $container);
 
-        self::assertFalse($container->has(AddApiLoginNormalizer::class));
+        self::assertFalse($container->has(OpenApiFactoryAddLoginEndpoint::class));
     }
 
     /** Test that the documentation service may be disabled. */
@@ -76,7 +77,7 @@ class ApiPlatformToolkitExtensionTest extends TestCase
             ]
         ], $container);
 
-        self::assertFalse($container->has(AddApiLoginNormalizer::class));
+        self::assertFalse($container->has(OpenApiFactoryAddLoginEndpoint::class));
     }
 
     /** Test that the documentation service may be disabled. */

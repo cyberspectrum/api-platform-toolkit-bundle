@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 use CyberSpectrum\ApiPlatformToolkit\EventListener\AddAudToJwtListener;
 use CyberSpectrum\ApiPlatformToolkit\EventListener\OverrideJwtTtlListener;
-use CyberSpectrum\ApiPlatformToolkit\Serializer\Normalizer\AddApiLoginNormalizer;
+use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryAddLoginEndpoint;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
@@ -39,12 +39,11 @@ return function (ContainerConfigurator $configurator): void {
             ['event' => 'lexik_jwt_authentication.on_jwt_created']
         );
 
-    $services->set(AddApiLoginNormalizer::class)
-        ->decorate('api_platform.swagger.normalizer.documentation', null, 100)
+    $services->set(OpenApiFactoryAddLoginEndpoint::class)
+        ->decorate('api_platform.openapi.factory', null, 100)
         ->arg('$decorated', service('.inner'))
         ->arg('$allowedFormats', param('api_platform.formats'))
-        ->arg('$parameters', [
-            'login_url' => param('csap_toolkit.lexik_jwt_login_url'),
-            'default_ttl' => param('csap_toolkit.lexik_jwt_default_ttl'),
-        ]);
+        ->arg('$loginUri', param('csap_toolkit.lexik_jwt_login_url'))
+        ->arg('$loginRefreshUri', param('csap_toolkit.lexik_jwt_login_refresh_url'))
+        ->arg('$defaultTtl', param('csap_toolkit.lexik_jwt_default_ttl'));
 };

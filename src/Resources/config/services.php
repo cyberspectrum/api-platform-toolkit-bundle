@@ -35,6 +35,6 @@ return function (ContainerConfigurator $configurator): void {
         ->autoconfigure(false);
 
     $services->set(OpenApiFactoryRemoveHtmlFormat::class)
-        ->decorate('api_platform.openapi.factory')
+        ->decorate('api_platform.openapi.factory', null, 10)
         ->arg('$decorated', service('.inner'));
 };

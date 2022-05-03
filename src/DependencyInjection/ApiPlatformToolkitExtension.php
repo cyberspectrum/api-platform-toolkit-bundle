@@ -17,8 +17,8 @@ declare(strict_types=1);
 namespace CyberSpectrum\ApiPlatformToolkit\DependencyInjection;
 
 use CyberSpectrum\ApiPlatformToolkit\EventListener\AddAudToJwtListener;
+use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryAddLoginEndpoint;
 use CyberSpectrum\ApiPlatformToolkit\OpenApi\OpenApiFactoryRemoveHtmlFormat;
-use CyberSpectrum\ApiPlatformToolkit\Serializer\Normalizer\AddApiLoginNormalizer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -43,13 +43,17 @@ class ApiPlatformToolkitExtension extends Extension
         if ($config['lexik_jwt']['enabled']) {
             $loader->load('lexik_jwt.php');
             if (!$config['lexik_jwt']['add_documentation']) {
-                $container->removeDefinition(AddApiLoginNormalizer::class);
+                $container->removeDefinition(OpenApiFactoryAddLoginEndpoint::class);
             }
             if (!$config['lexik_jwt']['add_aud']) {
                 $container->removeDefinition(AddAudToJwtListener::class);
             }
             $container->setParameter('csap_toolkit.lexik_jwt_default_ttl', $config['lexik_jwt']['default_ttl']);
             $container->setParameter('csap_toolkit.lexik_jwt_login_url', $config['lexik_jwt']['json_login_url']);
+            $container->setParameter(
+                'csap_toolkit.lexik_jwt_login_refresh_url',
+                $config['lexik_jwt']['json_login_refresh_url']
+            );
         }
 
         $loader->load('services.php');
