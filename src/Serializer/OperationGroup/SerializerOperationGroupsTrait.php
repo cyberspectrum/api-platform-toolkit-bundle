@@ -34,12 +34,7 @@ trait SerializerOperationGroupsTrait
     #[Serializer\Ignore]
     public static function getNormalizeCollectionGroups(): array
     {
-        $groups = [];
-
-        defined('self::READ') && $groups[] = self::READ;
-        defined('self::READ_COLLECTION') && $groups[] = self::READ_COLLECTION;
-
-        return $groups;
+        return self::readConstants('self::READ', 'self::READ_COLLECTION');
     }
 
     /**
@@ -49,12 +44,7 @@ trait SerializerOperationGroupsTrait
     #[Serializer\Ignore]
     public static function getNormalizeItemGroups(): array
     {
-        $groups = [];
-
-        defined('self::READ') && $groups[] = self::READ;
-        defined('self::READ_ITEM') && $groups[] = self::READ_ITEM;
-
-        return $groups;
+        return self::readConstants('self::READ', 'self::READ_ITEM');
     }
 
     /**
@@ -64,12 +54,7 @@ trait SerializerOperationGroupsTrait
     #[Serializer\Ignore]
     public static function getDenormalizeCreateGroups(): array
     {
-        $groups = [];
-
-        defined('self::WRITE') && $groups[] = self::WRITE;
-        defined('self::WRITE_CREATE') && $groups[] = self::WRITE_CREATE;
-
-        return $groups;
+        return self::readConstants('self::WRITE', 'self::WRITE_CREATE');
     }
 
     /**
@@ -79,11 +64,30 @@ trait SerializerOperationGroupsTrait
     #[Serializer\Ignore]
     public static function getDenormalizeUpdateGroups(): array
     {
-        $groups = [];
+        return self::readConstants('self::WRITE', 'self::WRITE_UPDATE');
+    }
 
-        defined('self::WRITE') && $groups[] = self::WRITE;
-        defined('self::WRITE_UPDATE') && $groups[] = self::WRITE_UPDATE;
+    /** @return list<string> */
+    private static function readConstants(string ...$names): array
+    {
+        $result = [];
+        foreach ($names as $name) {
+            if (null !== $value = self::readConstant($name)) {
+                $result[] = $value;
+            }
+        }
 
-        return $groups;
+        return $result;
+    }
+
+    private static function readConstant(string $name): ?string
+    {
+        /** @var mixed $value */
+        $value = constant($name);
+        if (is_string($value)) {
+            return $value;
+        }
+
+        return null;
     }
 }
