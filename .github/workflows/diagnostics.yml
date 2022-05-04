@@ -16,7 +16,7 @@ jobs:
             phpcq_install: 'install'
           - php: 7.4
             output: '-o github-action -o default'
-            composer_install: 'update --prefer-dist --no-interaction --no-scripts'
+            composer_install: 'update --prefer-dist --no-interaction --no-scripts --prefer-lowest'
             phpcq_install: 'install'
           - php: 8.0
             output: '-o github-action -o default'
