@@ -57,13 +57,13 @@ jobs:
         run: composer ${{ matrix.composer_install }}
 
       - name: PHP ${{ matrix.php }} Update phpcq
-        run: ./bin/phpcq self-update
+        run: ./vendor/bin/phpcq self-update
 
       - name: PHP ${{ matrix.php }} Install phpcq toolchain
-        run: ./bin/phpcq ${{ matrix.phpcq_install }} -v
+        run: ./vendor/bin/phpcq ${{ matrix.phpcq_install }} -v
 
       - name: PHP ${{ matrix.php }} Run tests
-        run: ./bin/phpcq run -v ${{ matrix.output }}
+        run: ./vendor/bin/phpcq run ${{ matrix.output }} -v
 
       - name: PHP ${{ matrix.php }} Upload build directory to artifact
         uses: actions/upload-artifact@v2
