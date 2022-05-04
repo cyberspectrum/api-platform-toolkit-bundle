@@ -6,7 +6,7 @@
   "require": {
     "php": "^7.4 || ^8.0",
     "ext-json": "*",
-    "api-platform/core": "^2.6",
+    "api-platform/core": "^2.6.3",
     "symfony/config": "^5.4 || ^6.0",
     "symfony/dependency-injection": "^5.4 || ^6.0",
     "symfony/http-foundation": "^5.4 || ^6.0",
